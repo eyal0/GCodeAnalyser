@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "description": "GCodeAnalyser",
+  "main": "run.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "tiny-worker": "^2.1.2"
+  }
+}
