@@ -100,6 +100,7 @@ Gcode.prototype.targetAccelerationPerAxis = undefined;
 Gcode.prototype.targetFeedratePerAxis = undefined;
 
 Gcode.prototype.loadGcode = function (gcodeLine) {
+    this.original_text = gcodeLine;
     var command = gcodeLine.split(";")[0].trim().toUpperCase();
     if (command.length != 0) {
         this.parameters = {};
@@ -539,6 +540,7 @@ function GcodeProcessor() {
             if (gcodeIndex < gcodeLines.length) {
                 var loadingGcode = new Gcode();
                 loadingGcode.loadGcode(gcodeLines[gcodeIndex]);
+                loadingGcode.filepos = bytes_so_far;
                 this.processGcode(loadingGcode);
                 if (loadingGcode.isMovement) {
                     this.gcodes.push(loadingGcode);
@@ -549,7 +551,9 @@ function GcodeProcessor() {
                 this.lastMovementGcode.nextMovementGcode = tailGcode;
                 gcodeIndex++;
             }
-
+            if (gcodeIndex-1 < gcodeLines.length) {
+              bytes_so_far += gcodeLines[gcodeIndex-1].length;
+            }
             if ((this.lastMovementGcode.movementGcodeIndex - calculationGcode.movementGcodeIndex > 1 || gcodeIndex > gcodeLines.length) && !("endOfMovementGcode" in calculationGcode)) {
                 if (calculationGcode.movementGcodeIndex == 0) {
                     headGcode.calculateSpeedByJerk();
@@ -663,11 +667,6 @@ function GcodeProcessor() {
                 time_so_far += (gcode.phaseTime[0] +
                                 gcode.phaseTime[1] +
                                 gcode.phaseTime[2]);
-                if (gcodeIndex < gcodeLines.length) {
-                  bytes_so_far += gcodeLines[gcodeIndex].length;
-                }
-                console.log("bytes: " + bytes_so_far +
-                            " time so far: " + time_so_far);
 
                 if (gcode.relativeCoord[0] != 0 || gcode.relativeCoord[1] != 0) {
                     if (xyFeedrateMax < gcode.feedrate) {
@@ -735,6 +734,10 @@ function GcodeProcessor() {
             var percent = Math.floor(gcodeIndex * 100 / gcodeLines.length);
             if (percent != Math.floor((gcodeIndex - 1) * 100 / gcodeLines.length)) {
                 postMessage({ "progress": percent });
+            }
+            if (gcode.filepos !== undefined) {
+                postMessage({"filepos": gcode.filepos,
+                             "printTime": time_so_far});
             }
         }
 
