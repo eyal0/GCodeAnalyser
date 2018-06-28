@@ -25,7 +25,11 @@ gcodeProcessorWorker.onmessage = function (e) {
 }
 fs.readFile(process.argv[2], "utf8",
             function(err, data) {
-              gcodeLines = data.split(/\s*[\r\n]+\s*/g);
+              gcodeLines = data.split(/(?=[\r\n]+)/g);
               //console.log(gcodeLines);
+              /*console.log(gcodeLines
+                          .map(x => x.length)
+                          .reduce((x,y) => x + y));*/
+
               gcodeProcessorWorker.postMessage([gcodeLines, settings]);
             });

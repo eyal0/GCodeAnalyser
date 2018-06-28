@@ -531,7 +531,8 @@ function GcodeProcessor() {
 
         // Speed Time Histogram
         this.STHistogram = [];
-      var mytotal = 0;
+        var time_so_far = 0;
+        var bytes_so_far = 0;
         // Calculate information required for calculating time
         while (true) {
             var loadingGcode;
@@ -654,18 +655,17 @@ function GcodeProcessor() {
                 layerTime += gcode.phaseTime[1];
                 layerTime += gcode.phaseTime[2];
 
-              console.log(gcodeLines[gcodeIndex] + " time: " +
-                          (gcode.phaseTime[0] +
-                           gcode.phaseTime[1] +
-                           gcode.phaseTime[2]))
                 // Calculate Result
                 var moveDistance = Math.sqrt(gcode.relativeCoord[0] * gcode.relativeCoord[0] + gcode.relativeCoord[1] * gcode.relativeCoord[1] + gcode.relativeCoord[2] * gcode.relativeCoord[2]);
                 gcode.phaseTime[0] *= this.settings.timeScale;
                 gcode.phaseTime[1] *= this.settings.timeScale;
                 gcode.phaseTime[2] *= this.settings.timeScale;
-              mytotal += (gcode.phaseTime[0] +
+              time_so_far += (gcode.phaseTime[0] +
                           gcode.phaseTime[1] +
-                          gcode.phaseTime[2]);
+                              gcode.phaseTime[2]);
+              bytes_so_far += gcodeLines[gcodeIndex].length;
+              /*console.log("bytes: " + bytes_so_far +
+                          " time so far: " + time_so_far);*/
 
                 if (gcode.relativeCoord[0] != 0 || gcode.relativeCoord[1] != 0) {
                     if (xyFeedrateMax < gcode.feedrate) {
@@ -735,7 +735,7 @@ function GcodeProcessor() {
                 postMessage({ "progress": percent });
             }
         }
-      console.log("mytotal is " + mytotal);
+      console.log("time_so_far is " + time_so_far);
         // Calculate Result
       var totalTime = totalAccelerationTime + totalConstantSpeedTime + totalDeccelerationTime;
       console.log("total time is " + totalTime);
