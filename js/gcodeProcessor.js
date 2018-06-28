@@ -735,10 +735,9 @@ function GcodeProcessor() {
                 postMessage({ "progress": percent });
             }
         }
-      console.log("time_so_far is " + time_so_far);
+
         // Calculate Result
-      var totalTime = totalAccelerationTime + totalConstantSpeedTime + totalDeccelerationTime;
-      console.log("total time is " + totalTime);
+        var totalTime = totalAccelerationTime + totalConstantSpeedTime + totalDeccelerationTime;
         result["numberOfLines"] = gcodeLines.length;
         result["printTime"] = secondsToHMS(totalTime);
         result["accelerationTime"] = secondsToHMS(totalAccelerationTime + totalDeccelerationTime) + " (" + ((totalAccelerationTime + totalDeccelerationTime) * 100 / totalTime).toFixed(1) + "%)";
