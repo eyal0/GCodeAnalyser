@@ -8,11 +8,17 @@ settings = {"maxSpeed":[100,100,10,100],"maxPrintAcceleration":[1000,1000,100,10
 
 var gcodeProcessorWorker = new Worker('gcodeProcessor.js');
 gcodeProcessorWorker.onmessage = function (e) {
-  //console.log(e);
+  console.log(e);
   if ("progress" in e.data) {
     console.log(e.data.progress);
   }
   if ("complete" in e.data) {
+  }
+  if ("layers" in e.data) {
+    //console.log(e.data.layers);
+    for (x of e.data.layers.layers) {
+      console.log(x.e);
+    }
     gcodeProcessorWorker.terminate();
   }
   //console.log(gcodeProcessorWorker)
