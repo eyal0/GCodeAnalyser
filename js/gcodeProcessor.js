@@ -660,12 +660,14 @@ function GcodeProcessor() {
                 gcode.phaseTime[0] *= this.settings.timeScale;
                 gcode.phaseTime[1] *= this.settings.timeScale;
                 gcode.phaseTime[2] *= this.settings.timeScale;
-              time_so_far += (gcode.phaseTime[0] +
-                          gcode.phaseTime[1] +
-                              gcode.phaseTime[2]);
-              bytes_so_far += gcodeLines[gcodeIndex].length;
-              /*console.log("bytes: " + bytes_so_far +
-                          " time so far: " + time_so_far);*/
+                time_so_far += (gcode.phaseTime[0] +
+                                gcode.phaseTime[1] +
+                                gcode.phaseTime[2]);
+                if (gcodeIndex < gcodeLines.length) {
+                  bytes_so_far += gcodeLines[gcodeIndex].length;
+                }
+                console.log("bytes: " + bytes_so_far +
+                            " time so far: " + time_so_far);
 
                 if (gcode.relativeCoord[0] != 0 || gcode.relativeCoord[1] != 0) {
                     if (xyFeedrateMax < gcode.feedrate) {
