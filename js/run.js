@@ -20,16 +20,17 @@ gcodeProcessorWorker.onmessage = function (e) {
     console.log("[0,0],")
     var last_printed_progress = 0;
     for (progress_entry of progress) {
-      var new_printed_progress = progress_entry[1]/total_printtime;
-      if (Math.floor(new_printed_progress*100) >
-          Math.floor(last_printed_progress*100)) {
+      var new_printed_progress = progress_entry[1];
+      if (last_printed_progress+60 < new_printed_progress) {
         console.log("[" + progress_entry[0]/total_filesize +
                     "," + progress_entry[1]/total_printtime +
                     "],");
         last_printed_progress = new_printed_progress;
       }
     }
-    console.log("[1,1]");
+    console.log("[" + progress[progress.length-1][0] +
+                "," + progress[progress.length-1][1] +
+                "]");
     console.log("]");
     gcodeProcessorWorker.terminate();
   }
