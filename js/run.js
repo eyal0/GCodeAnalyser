@@ -16,7 +16,7 @@ gcodeProcessorWorker.onmessage = function (e) {
     // All the data is in progress now.
     var total_filesize = progress[progress.length-1][0]
     var total_printtime = progress[progress.length-1][1]
-    console.log("[")
+    console.log("{\"progress\": [")
     console.log("[0,0],")
     var last_printed_progress = 0;
     for (progress_entry of progress) {
@@ -31,7 +31,7 @@ gcodeProcessorWorker.onmessage = function (e) {
     console.log("[" + progress[progress.length-1][0] +
                 "," + progress[progress.length-1][1] +
                 "]");
-    console.log("]");
+    console.log("]}");
     gcodeProcessorWorker.terminate();
   }
 }
