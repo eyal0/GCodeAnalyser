@@ -22,8 +22,8 @@ gcodeProcessorWorker.onmessage = function (e) {
     for (progress_entry of progress) {
       var new_printed_progress = progress_entry[1];
       if (last_printed_progress+60 < new_printed_progress) {
-        console.log("[" + progress_entry[0]/total_filesize +
-                    "," + progress_entry[1]/total_printtime +
+        console.log("[" + progress_entry[0] +
+                    "," + progress_entry[1] +
                     "],");
         last_printed_progress = new_printed_progress;
       }
