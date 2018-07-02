@@ -9,29 +9,23 @@ let gcodeProcessorWorker = new Worker(__dirname + '/gcodeProcessor.js');
 let progress = [];
 let result = {};
 gcodeProcessorWorker.onmessage = function (e) {
-  if ("filepos" in e.data) {
-    progress.push([e.data.filepos, e.data.printTime])
+  if ("filePosition" in e.data) {
+    progress.push(e.data)
   }
   if ("result" in e.data) {
     // All the data is in progress now.
-    let total_filesize = progress[progress.length-1][0]
-    let total_printtime = progress[progress.length-1][1]
     result["progress"] = []
-    result["progress"].push([0,0]);
+    //result["progress"].push([0,0]);
     let last_printed_progress = 0;
     for (progress_entry of progress) {
-      let new_printed_progress = progress_entry[1];
+      let new_printed_progress = progress_entry.printTime;
       if (last_printed_progress+60 < new_printed_progress) {
-        result["progress"].push([
-          progress_entry[0],
-          progress_entry[1]]);
+        result["progress"].push(progress_entry);
         last_printed_progress = new_printed_progress;
       }
     }
-    result["progress"].push([
-      progress[progress.length-1][0],
-      progress[progress.length-1][1]]);
-    result["estimatedPrintTime"] = progress[progress.length-1][1];
+    result["progress"].push(progress[progress.length-1]);
+    result["estimatedPrintTime"] = progress[progress.length-1]["printTime"];
     // All done.
     console.log(JSON.stringify(result));
     gcodeProcessorWorker.terminate();

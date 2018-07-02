@@ -540,7 +540,7 @@ function GcodeProcessor() {
             if (gcodeIndex < gcodeLines.length) {
                 var loadingGcode = new Gcode();
                 loadingGcode.loadGcode(gcodeLines[gcodeIndex]);
-                loadingGcode.filepos = bytes_so_far;
+                loadingGcode.filePosition = bytes_so_far;
                 this.processGcode(loadingGcode);
                 if (loadingGcode.isMovement) {
                     this.gcodes.push(loadingGcode);
@@ -735,9 +735,10 @@ function GcodeProcessor() {
             if (percent != Math.floor((gcodeIndex - 1) * 100 / gcodeLines.length)) {
                 postMessage({ "progress": percent });
             }
-            if (gcode.filepos !== undefined) {
-                postMessage({"filepos": gcode.filepos,
-                             "printTime": time_so_far});
+            if (gcode.filePosition !== undefined) {
+                postMessage({"filePosition": gcode.filePosition,
+                             "printTime": time_so_far,
+                             "filamentUsage": filamentUsage});
             }
         }
 
