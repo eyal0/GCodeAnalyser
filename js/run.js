@@ -9,7 +9,7 @@ let gcodeProcessorWorker = new Worker(__dirname + '/gcodeProcessor.js');
 let progress = [];
 let result = {};
 const MIN_FILAMENT = 5;  // Don't record times for anything before the first 5mm of filament.
-
+let filesize;
 gcodeProcessorWorker.onmessage = function (e) {
   if ("filePosition" in e.data) {
     progress.push(e.data)
@@ -31,16 +31,16 @@ gcodeProcessorWorker.onmessage = function (e) {
     progress.splice(0, startIndex);
     // All the data is in progress now.
     result["progress"] = []
-    result["progress"].push([progress[0]["filePosition"], progress[0]["printTime"]]);
+    result["progress"].push([progress[0]["filePosition"]/filesize, progress[0]["printTime"]]);
     let last_printed_progress = progress[0]["printTime"];
     for (progress_entry of progress) {
       let new_printed_progress = progress_entry.printTime ;
       if (last_printed_progress+60 < new_printed_progress) {
-        result["progress"].push([progress_entry["filePosition"], progress_entry["printTime"]]);
+        result["progress"].push([progress_entry["filePosition"]/filesize, progress_entry["printTime"]]);
         last_printed_progress = new_printed_progress;
       }
     }
-    result["progress"].push([progress[progress.length-1]["filePosition"], progress[progress.length-1]["printTime"]]);
+    result["progress"].push([progress[progress.length-1]["filePosition"]/filesize, progress[progress.length-1]["printTime"]]);
     // All done.
     console.log(JSON.stringify(result));
     gcodeProcessorWorker.terminate();
@@ -48,6 +48,7 @@ gcodeProcessorWorker.onmessage = function (e) {
 }
 fs.readFile(process.argv[2], "utf8",
             function(err, data) {
+              filesize = data.length;
               gcodeLines = data.split(/(?=[\r\n]+)/g);
               gcodeProcessorWorker.postMessage([gcodeLines, settings]);
             });
