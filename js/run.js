@@ -16,31 +16,22 @@ gcodeProcessorWorker.onmessage = function (e) {
   }
   if ("result" in e.data) {
     // progress is a list of objects, each with filePosition, printTime, and filamentUsage
-    // Everything before MIN_FILAMENT or after the first occurence of max filament should be removed.
-    result["estimatedPrintTime"] = progress[progress.length-1]["printTime"];
-    let endIndex = progress.length - 1;
-    while (progress[endIndex]["filamentUsage"] >= progress[progress.length - 1]["filamentUsage"]) {
-      endIndex--;
-    }
-    progress.splice(endIndex+2);
+    let totalPrintTime = progress[progress.length-1]["printTime"];
+    result["estimatedPrintTime"] = totalPrintTime;
 
-    let startIndex = 0;
-    while (progress[startIndex]["filamentUsage"] < MIN_FILAMENT) {
-      startIndex++;
-    }
-    progress.splice(0, startIndex);
     // All the data is in progress now.
     result["progress"] = []
-    result["progress"].push([progress[0]["filePosition"]/filesize, progress[0]["printTime"]]);
-    let last_printed_progress = progress[0]["printTime"];
+    result["progress"].push([0, result["estimatedPrintTime"]]);
+    let last_printed_progress = 0;
     for (progress_entry of progress) {
-      let new_printed_progress = progress_entry.printTime ;
+      let new_printed_progress = progress_entry["printTime"];
       if (last_printed_progress+60 < new_printed_progress) {
-        result["progress"].push([progress_entry["filePosition"]/filesize, progress_entry["printTime"]]);
+        result["progress"].push([progress_entry["filePosition"]/filesize, totalPrintTime - progress_entry["printTime"]]);
         last_printed_progress = new_printed_progress;
       }
     }
-    result["progress"].push([progress[progress.length-1]["filePosition"]/filesize, progress[progress.length-1]["printTime"]]);
+    result["progress"].push([progress[progress.length-1]["filePosition"]/filesize, totalPrintTime - progress[progress.length-1]["printTime"]]);
+    result["progress"].push([1,0]);
     // All done.
     console.log(JSON.stringify(result));
     gcodeProcessorWorker.terminate();
